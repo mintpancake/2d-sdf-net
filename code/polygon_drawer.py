@@ -6,7 +6,8 @@ CANVAS_SIZE = (800, 800)
 FINAL_LINE_COLOR = (255, 255, 255)
 WORKING_LINE_COLOR = (127, 127, 127)
 
-
+# The PolygonDrawer class is modified from
+# https://stackoverflow.com/questions/37099262/drawing-filled-polygon-using-mouse-events-in-open-cv-using-python/37235130
 class PolygonDrawer(object):
     def __init__(self, window_name):
         self.window_name = window_name  # Name for our window
