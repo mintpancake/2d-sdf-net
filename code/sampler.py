@@ -20,7 +20,6 @@ class ShapeSampler(object):
         self.normalize()
         self.sample()
         self.save()
-        return self.sampled_data
 
     def load(self):
         shape = []
@@ -111,4 +110,4 @@ class ShapeSampler(object):
 
 if __name__ == '__main__':
     sampler = ShapeSampler(SHAPE_PATH, SHAPE_IMAGE_PATH)
-    sampled_data = sampler.run()
+    sampler.run()

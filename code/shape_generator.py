@@ -91,7 +91,7 @@ class DataSaver(object):
         self.save_name = save_name
 
     def save(self):
-        f = open(f'{saver.data_path}{saver.save_name}.txt', 'w')
+        f = open(f'{self.data_path}{self.save_name}.txt', 'w')
         for point in self.points:
             # Normalize (x,y) to a unit square
             x = np.double(np.double(point[0]) / np.double(CANVAS_SIZE[0]))
@@ -99,11 +99,11 @@ class DataSaver(object):
             f.write(f'{x} {y}\n')
         f.close()
 
-        cv2.imwrite(f'{saver.image_path}{saver.save_name}.png', self.image)
+        cv2.imwrite(f'{self.image_path}{self.save_name}.png', self.image)
 
 
 if __name__ == '__main__':
-    drawer = PolygonDrawer('Left click: Add shapes    Right click: Complete polygon    Any key: Save datasets')
+    drawer = PolygonDrawer('Left click: Add vertices    Right click: Complete polygon    Any key: Save data')
     points, image = drawer.run()
     print(f'Polygon = {points}')
 
