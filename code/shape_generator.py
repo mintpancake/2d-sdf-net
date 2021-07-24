@@ -5,6 +5,9 @@ import time
 CANVAS_SIZE = (800, 800)
 FINAL_LINE_COLOR = (255, 255, 255)
 WORKING_LINE_COLOR = (127, 127, 127)
+# Customize shape name for easier identification
+SAVE_NAME = ''
+
 
 # The PolygonDrawer class is modified from
 # https://stackoverflow.com/questions/37099262/drawing-filled-polygon-using-mouse-events-in-open-cv-using-python/37235130
@@ -42,7 +45,7 @@ class PolygonDrawer(object):
         cv2.setMouseCallback(self.window_name, self.on_mouse)
 
         while not self.done:
-            # This is our drawing loop, we just continuously draw new images
+            # This is our drawing loop, we just continuously draw new shape_images
             # and show them in the named window
             canvas = np.zeros(CANVAS_SIZE, np.uint8)
             if len(self.points) > 0:
@@ -74,8 +77,8 @@ class DataSaver(object):
     def __init__(self, points, image):
         self.points = points
         self.image = image
-        self.data_path = '../data/'
-        self.image_path = '../images/'
+        self.data_path = '../shapes/'
+        self.image_path = '../shapes/shape_images/'
         self.save_name = f'polygon_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
 
     def set_data_path(self, data_path):
@@ -100,11 +103,13 @@ class DataSaver(object):
 
 
 if __name__ == '__main__':
-    drawer = PolygonDrawer('Left click: Add vertices    Right click: Complete polygon    Any key: Save data')
+    drawer = PolygonDrawer('Left click: Add shapes    Right click: Complete polygon    Any key: Save datasets')
     points, image = drawer.run()
     print(f'Polygon = {points}')
 
     saver = DataSaver(points, image)
+    if SAVE_NAME != '':
+        saver.set_save_name(SAVE_NAME)
     saver.save()
     print(f'Data path = {saver.data_path}{saver.save_name}.txt')
     print(f'Image path = {saver.image_path}{saver.save_name}.png')
