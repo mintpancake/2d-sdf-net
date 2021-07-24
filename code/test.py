@@ -8,11 +8,18 @@ while line:
     shape.append([x, y])
     line = f.readline()
 f.close()
-
 s = np.array(shape)
-print(s)
-a = np.linalg.norm(s[0] - s[1])
-print(a)
-a+=0.5
-b=np.around(a).astype(int)
-print(b)
+
+direction = (s[1] - s[0])
+d = np.random.uniform(0, 1, size=(2, 1))
+boundary_points = s[0] + d * direction
+for i in range(1, 10):
+    j = 0 if i + 1 >= 10 else i + 1
+    direction = (s[j] - s[i])
+    d = np.random.uniform(0, 1, size=(2, 1))
+    boundary_points = np.concatenate((boundary_points, s[i] + d * direction), axis=0)
+
+print(boundary_points)
+noise_1 = np.random.normal(loc=0, scale=np.sqrt(0.05), size=boundary_points.shape)
+print(noise_1)
+print((boundary_points+noise_1).shape)

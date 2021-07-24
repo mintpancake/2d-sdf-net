@@ -32,7 +32,7 @@ class ShapeSampler(object):
             self.num += 1
             line = f.readline()
         f.close()
-        self.shape = np.array(shape)
+        self.shape = np.array(shape, dtype=np.double)
 
     def normalize(self, margin=0.9):
         if self.num == 0:
@@ -66,23 +66,43 @@ class ShapeSampler(object):
         # Transform to Cartesian coordinate
         uniform_points = np.concatenate((r * np.cos(t), r * np.sin(t), np.zeros((n, 1))), axis=1)
 
-        # Do boundary sampling
+        # Do Gaussian sampling
         # Distribute points to each edge weighted by length
         total_length = 0
-        edge_portion = np.zeros(self.num, dtype=np.double)
+        edge_length = np.zeros(self.num, dtype=np.double)
         for i in range(self.num):
-            j = i + 1
-            if j >= self.num:
-                j = 0
-            length = np.linalg.norm(self.shape[i] - self.shape[j])
-            edge_portion[i] = length
+            j = 0 if i + 1 >= self.num else i + 1
+            length = np.linalg.norm(self.shape[j] - self.shape[i])
+            edge_length[i] = length
             total_length += length
-        edge_portion /= total_length
+        edge_portion = edge_length / total_length
         edge_portion *= m
-        num_per_edge = np.around(edge_portion).astype(int)
+        edge_num = np.around(edge_portion).astype(int)
 
-    def calculate_sdf(self):
-        pass
+        # Do sampling on edges
+        direction = (self.shape[1] - self.shape[0])
+        d = np.random.uniform(0, 1, size=(edge_num[0], 1))
+        boundary_points = self.shape[0] + d * direction
+        for i in range(1, self.num):
+            j = 0 if i + 1 >= self.num else i + 1
+            direction = (self.shape[j] - self.shape[i])
+            d = np.random.uniform(0, 1, size=(edge_num[i], 1))
+            boundary_points = np.concatenate((boundary_points, self.shape[i] + d * direction), axis=0)
+
+        # Perturbing boundary points
+        noise_1 = np.random.normal(loc=0, scale=np.sqrt(var[0]), size=boundary_points.shape)
+        noise_2 = np.random.normal(loc=0, scale=np.sqrt(var[1]), size=boundary_points.shape)
+        near_bound_points = np.concatenate((boundary_points + noise_1, boundary_points + noise_2), axis=0)
+        # Add a third column for sdf
+        gaussian_points = np.concatenate((near_bound_points, np.zeros((near_bound_points.shape[0], 1))), axis=1)
+
+        # Merge uniform and Gaussian points
+        sampled_points = np.concatenate((uniform_points, gaussian_points), axis=0)
+        self.sampled_data = self.calculate_sdf(sampled_points)
+
+    def calculate_sdf(self, points):
+        data = np.array([])
+        return data
 
     def save(self):
         pass
