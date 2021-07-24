@@ -64,7 +64,7 @@ class ShapeSampler(object):
         r = np.random.uniform(0, 1, size=(n, 1))
         t = np.random.uniform(0, 2 * np.pi, size=(n, 1))
         # Transform to Cartesian coordinate
-        uniform_points = np.concatenate((r * np.cos(t), r * np.sin(t), np.zeros((n, 1))), axis=1)
+        uniform_points = np.concatenate((r * np.cos(t), r * np.sin(t)), axis=1)
 
         # Do Gaussian sampling
         # Distribute points to each edge weighted by length
@@ -92,15 +92,16 @@ class ShapeSampler(object):
         # Perturbing boundary points
         noise_1 = np.random.normal(loc=0, scale=np.sqrt(var[0]), size=boundary_points.shape)
         noise_2 = np.random.normal(loc=0, scale=np.sqrt(var[1]), size=boundary_points.shape)
-        near_bound_points = np.concatenate((boundary_points + noise_1, boundary_points + noise_2), axis=0)
-        # Add a third column for sdf
-        gaussian_points = np.concatenate((near_bound_points, np.zeros((near_bound_points.shape[0], 1))), axis=1)
+        gaussian_points = np.concatenate((boundary_points + noise_1, boundary_points + noise_2), axis=0)
 
         # Merge uniform and Gaussian points
         sampled_points = np.concatenate((uniform_points, gaussian_points), axis=0)
         self.sampled_data = self.calculate_sdf(sampled_points)
 
-    def calculate_sdf(self, points):
+    def calculate_sdf(self, pts):
+        # Add a third column for storing sdf
+        points = np.concatenate((pts, np.zeros((pts.shape[0], 1))), axis=1)
+
         data = np.array([])
         return data
 
