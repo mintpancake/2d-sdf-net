@@ -6,10 +6,10 @@ CANVAS_SIZE = (800, 800)
 FINAL_LINE_COLOR = (255, 255, 255)
 WORKING_LINE_COLOR = (127, 127, 127)
 # Customize shape name for easier identification
-SAVE_NAME = ''
+SAVE_NAME = 'cat'
 
 
-# The PolygonDrawer class is modified from
+# The PolygonDrawer class is adapted from
 # https://stackoverflow.com/questions/37099262/drawing-filled-polygon-using-mouse-events-in-open-cv-using-python/37235130
 class PolygonDrawer(object):
     def __init__(self, window_name):
@@ -93,7 +93,7 @@ class DataSaver(object):
     def save(self):
         f = open(f'{self.data_path}{self.save_name}.txt', 'w')
         for point in self.points:
-            # Normalize (x,y) to a unit square
+            # Normalize (x,y) to (0,1)
             x = np.double(np.double(point[0]) / np.double(CANVAS_SIZE[0]))
             y = np.double(np.double(point[1]) / np.double(CANVAS_SIZE[1]))
             f.write(f'{x} {y}\n')
