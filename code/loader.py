@@ -8,7 +8,7 @@ class SDFData(Dataset):
         :param file: Should be in the format of "dir/file.txt"
         """
         self.file = file
-        self.data = self.read()
+        self.data = self.load()
 
     def __getitem__(self, item):
         xy = self.data[item, :2]
@@ -18,7 +18,7 @@ class SDFData(Dataset):
     def __len__(self):
         return len(self.data)
 
-    def read(self):
+    def load(self):
         data = []
         f = open(self.file, 'r')
         line = f.readline()

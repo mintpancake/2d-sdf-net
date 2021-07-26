@@ -54,7 +54,18 @@ class Polygon(object):
 
 
 class ShapeSampler(object):
-    def __init__(self, shape_name, shape_path, shape_image_path, sampled_data_path, sampled_image_path):
+    def __init__(self, shape_name, shape_path, shape_image_path, sampled_data_path, sampled_image_path,
+                 show_image=True, split_ratio=0.8):
+        """
+        :param shape_name: "file"
+        :param shape_path: "dir/"
+        :param shape_image_path: "file"
+        :param sampled_data_path: "dir/"
+        :param sampled_image_path: "dir/"
+        :param show_image: Launch a windows showing sampled image
+        :param split_ratio: train / (train + val)
+        """
+
         self.shape_name = shape_name
 
         self.shape_path = shape_path
@@ -66,11 +77,14 @@ class ShapeSampler(object):
         self.shape = Polygon()
         self.sampled_data = np.array([])
 
-    def run(self, show_image):
+        self.show_image = show_image
+        self.split_ratio = split_ratio
+
+    def run(self):
         self.load()
         self.normalize()
         self.sample()
-        self.save(show_image)
+        self.save()
 
     def load(self):
         vertices = []
@@ -100,7 +114,7 @@ class ShapeSampler(object):
         trans_shape *= scaling_factor
         self.shape.v = trans_shape
 
-    def sample(self, m=4000, n=1000, var=(0.0025, 0.00025)):
+    def sample(self, m=5000, n=2000, var=(0.0025, 0.00025)):
         """
         :param m: number of points sampled on the boundary
                   each boundary point generates 2 samples
@@ -157,7 +171,8 @@ class ShapeSampler(object):
         data[:, 2] = np.apply_along_axis(self.shape.sdf, 1, data[:, :2])
         return data
 
-    def save(self, show_image):
+    def save(self):
+        # TODO: split data into train dataset and val dataset
         if self.shape.num == 0:
             return
 
@@ -169,7 +184,7 @@ class ShapeSampler(object):
             f.write(f'{datum[0]} {datum[1]} {datum[2]}\n')
         f.close()
 
-        if not show_image:
+        if not self.show_image:
             return
 
         # Generate a sampled image
@@ -199,5 +214,5 @@ if __name__ == '__main__':
     shape_name = input()
     sampler = ShapeSampler(shape_name, SHAPE_PATH, SHAPE_IMAGE_PATH, SAMPLED_DATA_PATH, SAMPLED_IMAGE_PATH)
     print('Sampling...')
-    sampler.run(show_image=True)
+    sampler.run()
     print('Done!')
