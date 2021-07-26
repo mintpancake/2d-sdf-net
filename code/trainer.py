@@ -5,10 +5,12 @@ from torch.utils.data import Dataset, DataLoader
 
 from net import SDFNet
 from loader import SDFData
+from renderer import plot_sdf
 
 TRAIN_DATA_PATH = '../datasets/train/'
 VAL_DATA_PATH = '../datasets/val/'
 MODEL_PATH = '../models/'
+RES_PATH = '../results/'
 
 
 def train_loop(dataloader, model, loss_fn, optimizer, device, theta=0.1):
@@ -72,3 +74,6 @@ if __name__ == '__main__':
         val_loop(val_dataloader, model, loss_fn, device)
     torch.save(model.state_dict(), f'{MODEL_PATH}{name}.pth')
     print('Done!')
+
+    # Plot results
+    plot_sdf(model, device, filepath=RES_PATH, filename=f'{name}.png', is_net=True)
