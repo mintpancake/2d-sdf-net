@@ -6,7 +6,7 @@ import torch
 # Adapted from https://github.com/Oktosha/DeepSDF-explained/blob/master/deepSDF-explained.ipynb
 def plot_sdf(sdf_func, device, size=800, filepath='', filename='res.png', is_net=False):
     # Sample the 2D domain as a regular grid
-    coordinates_linspace = np.linspace(-4, 4, 101)
+    coordinates_linspace = np.linspace(-0.5, 0.5, 101)
     y, x = np.meshgrid(coordinates_linspace, coordinates_linspace)
     if not is_net:
         z = [[sdf_func(np.float_([x_, y_]))
