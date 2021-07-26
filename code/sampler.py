@@ -73,15 +73,15 @@ class ShapeSampler(object):
         self.save(show_image)
 
     def load(self):
-        shape = []
+        vertices = []
         f = open(f'{self.shape_path}{self.shape_name}.txt', 'r')
         line = f.readline()
         while line:
             x, y = map(lambda n: np.double(n), line.strip('\n').split(' '))
-            shape.append([x, y])
+            vertices.append([x, y])
             line = f.readline()
         f.close()
-        self.shape.set_v(np.array(shape, dtype=np.double))
+        self.shape.set_v(np.array(vertices, dtype=np.double))
 
     def normalize(self, scope=0.4):
         """

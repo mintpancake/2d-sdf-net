@@ -6,7 +6,7 @@ CANVAS_SIZE = (800, 800)
 FINAL_LINE_COLOR = (255, 255, 255)
 WORKING_LINE_COLOR = (127, 127, 127)
 # Customize shape name for easier identification
-SAVE_NAME = 'cat'
+SAVE_NAME = ''
 
 
 # The PolygonDrawer class is adapted from
