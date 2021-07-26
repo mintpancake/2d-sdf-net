@@ -2,9 +2,10 @@ import numpy as np
 import cv2
 
 SHAPE_PATH = '../shapes/'
-SHAPE_IMAGE_PATH = '../shapes/shape_images/'
-SAMPLED_DATA_PATH = '../datasets/'
+TRAIN_DATA_PATH = '../datasets/train/'
+VAL_DATA_PATH = '../datasets/val/'
 SAMPLED_IMAGE_PATH = '../datasets/sampled_images/'
+
 CANVAS_SIZE = np.array([800, 800])  # Keep two dimensions the same
 SHAPE_COLOR = (255, 255, 255)
 POINT_COLOR = (127, 127, 127)
@@ -54,28 +55,29 @@ class Polygon(object):
 
 
 class ShapeSampler(object):
-    def __init__(self, shape_name, shape_path, shape_image_path, sampled_data_path, sampled_image_path,
+    def __init__(self, shape_name, shape_path, train_data_path, val_data_path, sampled_image_path,
                  show_image=True, split_ratio=0.8):
         """
         :param shape_name: "file"
         :param shape_path: "dir/"
-        :param shape_image_path: "file"
-        :param sampled_data_path: "dir/"
+        :param train_data_path: "dir/"
+        :param val_data_path: "dir/"
         :param sampled_image_path: "dir/"
         :param show_image: Launch a windows showing sampled image
         :param split_ratio: train / (train + val)
         """
 
         self.shape_name = shape_name
-
         self.shape_path = shape_path
-        self.shape_image_path = shape_image_path
 
-        self.sampled_data_path = sampled_data_path
+        self.train_data_path = train_data_path
+        self.val_data_path = val_data_path
         self.sampled_image_path = sampled_image_path
 
         self.shape = Polygon()
         self.sampled_data = np.array([])
+        self.train_data = np.array([])
+        self.val_data = np.array([])
 
         self.show_image = show_image
         self.split_ratio = split_ratio
@@ -162,6 +164,16 @@ class ShapeSampler(object):
         sampled_points = np.concatenate((uniform_points, gaussian_points), axis=0)
         self.sampled_data = self.calculate_sdf(sampled_points)
 
+        # Split sampled data into train dataset and val dataset
+        train_size = int(len(self.sampled_data) * self.split_ratio)
+        val_size = len(self.sampled_data) - train_size
+        choice = np.random.choice(range(self.sampled_data.shape[0]), size=(train_size,), replace=False)
+        ind = np.zeros(self.sampled_data.shape[0], dtype=bool)
+        ind[choice] = True
+        rest = ~ind
+        self.train_data = self.sampled_data[ind]
+        self.val_data = self.sampled_data[rest]
+
     def calculate_sdf(self, points):
         if self.shape.num == 0:
             return
@@ -172,15 +184,18 @@ class ShapeSampler(object):
         return data
 
     def save(self):
-        # TODO: split data into train dataset and val dataset
         if self.shape.num == 0:
             return
 
-        save_name = f'sampled_{self.shape_name}'
+        save_name = self.shape_name
 
-        # Save sampled data to .txt
-        f = open(f'{self.sampled_data_path}{save_name}.txt', 'w')
-        for datum in self.sampled_data:
+        # Save data to .txt
+        f = open(f'{self.train_data_path}{save_name}.txt', 'w')
+        for datum in self.train_data:
+            f.write(f'{datum[0]} {datum[1]} {datum[2]}\n')
+        f.close()
+        f = open(f'{self.val_data_path}{save_name}.txt', 'w')
+        for datum in self.val_data:
             f.write(f'{datum[0]} {datum[1]} {datum[2]}\n')
         f.close()
 
@@ -212,7 +227,7 @@ class ShapeSampler(object):
 if __name__ == '__main__':
     print('Enter shape name:')
     shape_name = input()
-    sampler = ShapeSampler(shape_name, SHAPE_PATH, SHAPE_IMAGE_PATH, SAMPLED_DATA_PATH, SAMPLED_IMAGE_PATH)
+    sampler = ShapeSampler(shape_name, SHAPE_PATH, TRAIN_DATA_PATH, VAL_DATA_PATH, SAMPLED_IMAGE_PATH)
     print('Sampling...')
     sampler.run()
     print('Done!')
