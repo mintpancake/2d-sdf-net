@@ -75,7 +75,7 @@ class DataSaver(object):
     def __init__(self, points, image):
         self.points = points
         self.image = image
-        self.data_path = '../shapes/raw'
+        self.data_path = '../shapes/raw/'
         self.image_path = '../shapes/raw_images/'
         self.save_name = f'polygon_{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}'
 

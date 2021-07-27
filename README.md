@@ -5,6 +5,7 @@ This is a neural network approximating a two-dimensional signed distance functio
 ### Requirements
 
 * PyTorch
+* Tensorboard
 * OpenCV
 
 ### Get Started
@@ -12,3 +13,4 @@ This is a neural network approximating a two-dimensional signed distance functio
 1. `code/drawer.py`
 2. `code/sampler.py`
 3. `code/trainer.py`
+4. `code/renderer.py` (optional)
