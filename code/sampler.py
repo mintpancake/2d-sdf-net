@@ -56,15 +56,15 @@ class Polygon(object):
 
 class ShapeSampler(object):
     def __init__(self, shape_name, shape_path, train_data_path, val_data_path, sampled_image_path,
-                 show_image=True, split_ratio=0.8):
+                 split_ratio=0.8, show_image=False):
         """
         :param shape_name: "file"
         :param shape_path: "dir/"
         :param train_data_path: "dir/"
         :param val_data_path: "dir/"
         :param sampled_image_path: "dir/"
-        :param show_image: Launch a windows showing sampled image
         :param split_ratio: train / (train + val)
+        :param show_image: Launch a windows showing sampled image
         """
 
         self.shape_name = shape_name
@@ -79,8 +79,8 @@ class ShapeSampler(object):
         self.train_data = np.array([])
         self.val_data = np.array([])
 
-        self.show_image = show_image
         self.split_ratio = split_ratio
+        self.show_image = show_image
 
     def run(self):
         self.load()
@@ -166,7 +166,6 @@ class ShapeSampler(object):
 
         # Split sampled data into train dataset and val dataset
         train_size = int(len(self.sampled_data) * self.split_ratio)
-        val_size = len(self.sampled_data) - train_size
         choice = np.random.choice(range(self.sampled_data.shape[0]), size=(train_size,), replace=False)
         ind = np.zeros(self.sampled_data.shape[0], dtype=bool)
         ind[choice] = True
@@ -199,12 +198,7 @@ class ShapeSampler(object):
             f.write(f'{datum[0]} {datum[1]} {datum[2]}\n')
         f.close()
 
-        if not self.show_image:
-            return
-
         # Generate a sampled image
-        window_name = 'Sampled Image'
-        cv2.namedWindow(window_name)
         canvas = np.zeros(CANVAS_SIZE, np.uint8)
         # Draw polygon
         scaled_v = np.around(self.shape.v * CANVAS_SIZE + CANVAS_SIZE / 2).astype(int)
@@ -219,7 +213,11 @@ class ShapeSampler(object):
 
         # Store and show
         cv2.imwrite(f'{self.sampled_image_path}{save_name}.png', canvas)
-        cv2.imshow(window_name, canvas)
+
+        if not self.show_image:
+            return
+
+        cv2.imshow('Sampled Image', canvas)
         cv2.waitKey()
         cv2.destroyAllWindows()
 
@@ -227,7 +225,7 @@ class ShapeSampler(object):
 if __name__ == '__main__':
     print('Enter shape name:')
     shape_name = input()
-    sampler = ShapeSampler(shape_name, SHAPE_PATH, TRAIN_DATA_PATH, VAL_DATA_PATH, SAMPLED_IMAGE_PATH)
+    sampler = ShapeSampler(shape_name, SHAPE_PATH, TRAIN_DATA_PATH, VAL_DATA_PATH, SAMPLED_IMAGE_PATH, show_image=False)
     print('Sampling...')
     sampler.run()
     print('Done!')

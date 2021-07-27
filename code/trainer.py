@@ -22,8 +22,9 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, theta=0.1):
         pred_sdf = model(xy)
         loss = loss_fn(torch.clamp(pred_sdf, min=-theta, max=theta), torch.clamp(sdf, min=-theta, max=theta))
 
-        optimizer.zero_grad()
         loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
 
         if batch % 100 == 0:
             loss, current = loss.item(), batch * len(xy)
@@ -76,4 +77,4 @@ if __name__ == '__main__':
     print('Done!')
 
     # Plot results
-    plot_sdf(model, device, filepath=RES_PATH, filename=f'{name}.png', is_net=True)
+    plot_sdf(model, device, filepath=RES_PATH, filename=f'{name}.png', is_net=True, show=False)
