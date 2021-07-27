@@ -202,6 +202,8 @@ class ShapeSampler(object):
         for datum in self.val_data:
             f.write(f'{datum[0]} {datum[1]} {datum[2]}\n')
         f.close()
+        print(f'Sampled data path = {self.train_data_path}{save_name}.txt\n'
+              f'                    {self.val_data_path}{save_name}.txt')
 
         # Generate a sampled image
         canvas = np.zeros(CANVAS_SIZE, np.uint8)
@@ -218,6 +220,7 @@ class ShapeSampler(object):
 
         # Store and show
         cv2.imwrite(f'{self.sampled_image_path}{save_name}.png', canvas)
+        print(f'Sampled image path = {self.sampled_image_path}{save_name}.png')
 
         if not self.show_image:
             return

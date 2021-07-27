@@ -5,8 +5,6 @@ import time
 CANVAS_SIZE = (800, 800)
 FINAL_LINE_COLOR = (255, 255, 255)
 WORKING_LINE_COLOR = (127, 127, 127)
-# Customize shape name for easier identification
-SAVE_NAME = ''
 
 
 # The PolygonDrawer class is adapted from
@@ -103,13 +101,17 @@ class DataSaver(object):
 
 
 if __name__ == '__main__':
+    print(f'Enter save name (skip with enter key): ')
+    name = input()
+
     drawer = PolygonDrawer('Left click: Add vertices    Right click: Complete polygon    Any key: Save data')
     points, image = drawer.run()
     print(f'Polygon = {points}')
 
     saver = DataSaver(points, image)
-    if SAVE_NAME != '':
-        saver.set_save_name(SAVE_NAME)
+    if name != '':
+        saver.set_save_name(name)
     saver.save()
     print(f'Data path = {saver.data_path}{saver.save_name}.txt')
     print(f'Image path = {saver.image_path}{saver.save_name}.png')
+    print('Done!')

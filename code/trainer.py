@@ -78,8 +78,9 @@ if __name__ == '__main__':
         train_loop(train_dataloader, model, loss_fn, optimizer, device)
         val_loop(val_dataloader, model, loss_fn, device)
     torch.save(model.state_dict(), f'{MODEL_PATH}{name}.pth')
-    print('Done!')
+    print(f'Complete training with {epochs} epochs!')
 
     # Plot results
     print('Plotting results...')
     plot_sdf(model, device, filepath=RES_PATH, filename=name, is_net=True, show=False)
+    print('Done!')
