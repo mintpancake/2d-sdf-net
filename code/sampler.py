@@ -2,7 +2,9 @@ import numpy as np
 import cv2
 from renderer import plot_sdf
 
-SHAPE_PATH = '../shapes/'
+SHAPE_PATH = '../shapes/raw/'
+NORM_PATH = '../shapes/normalized/'
+NORM_IMAGE_PATH = '../shapes/normalized_images/'
 TRAIN_DATA_PATH = '../datasets/train/'
 VAL_DATA_PATH = '../datasets/val/'
 SAMPLED_IMAGE_PATH = '../datasets/sampled_images/'
@@ -58,13 +60,15 @@ class Polygon(object):
 
 class ShapeSampler(object):
     def __init__(self, shape_name, shape_path, train_data_path, val_data_path, sampled_image_path,
-                 split_ratio=0.8, show_image=False):
+                 norm_path, norm_image_path, split_ratio=0.8, show_image=False):
         """
         :param shape_name: "file"
         :param shape_path: "dir/"
         :param train_data_path: "dir/"
         :param val_data_path: "dir/"
         :param sampled_image_path: "dir/"
+        :param norm_path: "dir/"
+        :param norm_image_path: "dir/"
         :param split_ratio: train / (train + val)
         :param show_image: Launch a windows showing sampled image
         """
@@ -75,6 +79,9 @@ class ShapeSampler(object):
         self.train_data_path = train_data_path
         self.val_data_path = val_data_path
         self.sampled_image_path = sampled_image_path
+
+        self.norm_path = norm_path
+        self.norm_image_path = norm_image_path
 
         self.shape = Polygon()
         self.sampled_data = np.array([])
@@ -118,8 +125,24 @@ class ShapeSampler(object):
         trans_shape *= scaling_factor
         self.shape.v = trans_shape
 
-        # plot_sdf
-        plot_sdf(self.shape.sdf, 'cpu', filepath=HEATMAP_PATH, filename=self.shape_name, is_net=False, show=False)
+        # Save normalized data
+        save_name = self.shape_name
+
+        f = open(f'{self.norm_path}{save_name}.txt', 'w')
+        for datum in self.shape.v:
+            f.write(f'{datum[0]} {datum[1]}\n')
+        f.close()
+        print(f'Normalized data path = {self.norm_path}{save_name}.txt')
+
+        canvas = np.zeros(CANVAS_SIZE, np.uint8)
+        scaled_v = np.around(self.shape.v * CANVAS_SIZE + CANVAS_SIZE / 2).astype(int)
+        cv2.polylines(canvas, scaled_v[np.newaxis, :, :], True, SHAPE_COLOR, 2)
+        cv2.imwrite(f'{self.norm_image_path}{save_name}.png', canvas)
+        print(f'Normalized image path = {self.norm_image_path}{save_name}.png')
+
+        # Plot_sdf
+        plot_sdf(self.shape.sdf, 'cpu', res_path=HEATMAP_PATH, name=self.shape_name, mask_path=NORM_IMAGE_PATH,
+                 is_net=False, show=False)
 
     def sample(self, m=5000, n=2000, var=(0.0025, 0.00025)):
         """
@@ -233,7 +256,8 @@ class ShapeSampler(object):
 if __name__ == '__main__':
     print('Enter shape name:')
     shape_name = input()
-    sampler = ShapeSampler(shape_name, SHAPE_PATH, TRAIN_DATA_PATH, VAL_DATA_PATH, SAMPLED_IMAGE_PATH, show_image=False)
+    sampler = ShapeSampler(shape_name, SHAPE_PATH, TRAIN_DATA_PATH, VAL_DATA_PATH,
+                           SAMPLED_IMAGE_PATH, NORM_PATH, NORM_IMAGE_PATH, show_image=False)
     print('Sampling...')
     sampler.run()
     print('Done!')
