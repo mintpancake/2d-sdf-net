@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-import torch
 from renderer import plot_sdf
 
 SHAPE_PATH = '../shapes/'

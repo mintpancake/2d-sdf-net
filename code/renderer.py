@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import torch
-from torchvision.transforms import Resize
 
 
 # Adapted from https://github.com/Oktosha/DeepSDF-explained/blob/master/deepSDF-explained.ipynb
