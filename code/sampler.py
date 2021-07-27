@@ -1,10 +1,13 @@
 import numpy as np
 import cv2
+import torch
+from renderer import plot_sdf
 
 SHAPE_PATH = '../shapes/'
 TRAIN_DATA_PATH = '../datasets/train/'
 VAL_DATA_PATH = '../datasets/val/'
 SAMPLED_IMAGE_PATH = '../datasets/sampled_images/'
+HEATMAP_PATH = '../results/true_heatmaps/'
 
 CANVAS_SIZE = np.array([800, 800])  # Keep two dimensions the same
 SHAPE_COLOR = (255, 255, 255)
@@ -115,6 +118,9 @@ class ShapeSampler(object):
         scaling_factor = scope / max_dist
         trans_shape *= scaling_factor
         self.shape.v = trans_shape
+
+        # plot_sdf
+        plot_sdf(self.shape.sdf, 'cpu', filepath=HEATMAP_PATH, filename=self.shape_name, is_net=False, show=False)
 
     def sample(self, m=5000, n=2000, var=(0.0025, 0.00025)):
         """

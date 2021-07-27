@@ -10,7 +10,7 @@ from renderer import plot_sdf
 TRAIN_DATA_PATH = '../datasets/train/'
 VAL_DATA_PATH = '../datasets/val/'
 MODEL_PATH = '../models/'
-RES_PATH = '../results/'
+RES_PATH = '../results/trained_heatmaps/'
 
 
 def train_loop(dataloader, model, loss_fn, optimizer, device, theta=0.1):
@@ -18,15 +18,15 @@ def train_loop(dataloader, model, loss_fn, optimizer, device, theta=0.1):
     size = len(dataloader.dataset)
     for batch, (xy, sdf) in enumerate(dataloader):
         xy, sdf = xy.to(device), sdf.to(device)
-
         pred_sdf = model(xy)
+        sdf = torch.reshape(sdf, pred_sdf.shape)
         loss = loss_fn(torch.clamp(pred_sdf, min=-theta, max=theta), torch.clamp(sdf, min=-theta, max=theta))
 
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
 
-        if batch % 100 == 0:
+        if batch % 50 == 0:
             loss, current = loss.item(), batch * len(xy)
             print(f'loss: {loss:>7f}  [{current:>5d}/{size:>5d}]')
 
@@ -40,6 +40,7 @@ def val_loop(dataloader, model, loss_fn, device, theta=0.1):
         for xy, sdf in dataloader:
             xy, sdf = xy.to(device), sdf.to(device)
             pred_sdf = model(xy)
+            sdf = torch.reshape(sdf, pred_sdf.shape)
             loss = loss_fn(torch.clamp(pred_sdf, min=-theta, max=theta), torch.clamp(sdf, min=-theta, max=theta))
             test_loss += loss
 
@@ -51,6 +52,7 @@ if __name__ == '__main__':
     batch_size = 64
     learning_rate = 1e-5
     epochs = 1000
+    regularization = 0  # Default: 1e-2
 
     print('Enter shape name:')
     name = input()
@@ -58,16 +60,18 @@ if __name__ == '__main__':
     train_data = SDFData(f'{TRAIN_DATA_PATH}{name}.txt')
     val_data = SDFData(f'{VAL_DATA_PATH}{name}.txt')
 
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, drop_last=True)
     val_dataloader = DataLoader(val_data, batch_size=batch_size, shuffle=True)
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print(f'Using {device}!')
+
     model = SDFNet().to(device)
     if os.path.exists(f'{MODEL_PATH}{name}.pth'):
         model.load_state_dict(torch.load(f'{MODEL_PATH}{name}.pth'))
 
     loss_fn = nn.L1Loss().to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-2)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=regularization)
 
     for t in range(epochs):
         print(f'Epoch {t + 1}\n-------------------------------')
@@ -77,4 +81,5 @@ if __name__ == '__main__':
     print('Done!')
 
     # Plot results
-    plot_sdf(model, device, filepath=RES_PATH, filename=f'{name}.png', is_net=True, show=False)
+    print('Plotting results...')
+    plot_sdf(model, device, filepath=RES_PATH, filename=name, is_net=True, show=False)

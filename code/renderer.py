@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import torch
+from torchvision.transforms import Resize
 
 
 # Adapted from https://github.com/Oktosha/DeepSDF-explained/blob/master/deepSDF-explained.ipynb
@@ -11,25 +12,23 @@ def plot_sdf(sdf_func, device, img_size=800, filepath='', filename='res', is_net
     grid_size = 100
 
     grid = np.linspace(low, high, grid_size + 1)
-    # y, x = np.meshgrid(grid, grid)
     if not is_net:
         sdf_map = [[sdf_func(np.float_([x_, y_]))
                     for y_ in grid] for x_ in grid]
+        sdf_map = np.array(sdf_map, dtype=np.float)
     else:
-        sdf_map = [[sdf_func(torch.Tensor([x_, y_]).to(device)).detach().cpu()
-                    for y_ in grid] for x_ in grid]
+        # Input shape is [1, 2]
+        sdf_func.eval()
+        with torch.no_grad():
+            sdf_map = [[sdf_func(torch.Tensor([[x_, y_]]).to(device)).detach().cpu()
+                        for y_ in grid] for x_ in grid]
+        sdf_map = torch.Tensor(sdf_map).cpu().numpy()
 
-    sdf_map = np.float_(sdf_map)
     sdf_map = sdf_map[:-1, :-1]
 
     # Scale to canvas size
     scale = int(img_size / grid_size)
     sdf_map = np.kron(sdf_map, np.ones((scale, scale)))
-
-    # z_min, z_max = -np.abs(z).max(), np.abs(z).max()
-    # z = np.abs(z) / z_max * 255
-    # sdf_map = 1 / (1 + np.exp(-20 * sdf_map)) * 255
-    # sdf_map = np.uint8(sdf_map)
 
     # Generate a heat map
     heat_map = None
