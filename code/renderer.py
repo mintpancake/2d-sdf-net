@@ -5,7 +5,7 @@ import torch
 from net import SDFNet
 
 MODEL_PATH = '../models/'
-MASK_PATH = '../shapes/normalized_images/'
+MASK_PATH = '../shapes/masks/'
 RES_PATH = '../results/trained_heatmaps/'
 
 

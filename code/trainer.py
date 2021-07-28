@@ -13,7 +13,7 @@ TRAIN_DATA_PATH = '../datasets/train/'
 VAL_DATA_PATH = '../datasets/val/'
 MODEL_PATH = '../models/'
 RES_PATH = '../results/trained_heatmaps/'
-MASK_PATH = '../shapes/normalized_images/'
+MASK_PATH = '../shapes/masks/'
 LOG_PATH = '../logs/'
 
 if __name__ == '__main__':
