@@ -21,7 +21,7 @@ if __name__ == '__main__':
     learning_rate = 1e-5
     epochs = 1000
     regularization = 0  # Default: 1e-2
-    theta = 0.1
+    delta = 0.1
 
     print('Enter shape name:')
     name = input()
@@ -57,7 +57,7 @@ if __name__ == '__main__':
             xy, sdf = xy.to(device), sdf.to(device)
             pred_sdf = model(xy)
             sdf = torch.reshape(sdf, pred_sdf.shape)
-            loss = loss_fn(torch.clamp(pred_sdf, min=-theta, max=theta), torch.clamp(sdf, min=-theta, max=theta))
+            loss = loss_fn(torch.clamp(pred_sdf, min=-delta, max=delta), torch.clamp(sdf, min=-delta, max=delta))
 
             loss.backward()
             optimizer.step()
@@ -81,7 +81,7 @@ if __name__ == '__main__':
                 xy, sdf = xy.to(device), sdf.to(device)
                 pred_sdf = model(xy)
                 sdf = torch.reshape(sdf, pred_sdf.shape)
-                loss = loss_fn(torch.clamp(pred_sdf, min=-theta, max=theta), torch.clamp(sdf, min=-theta, max=theta))
+                loss = loss_fn(torch.clamp(pred_sdf, min=-delta, max=delta), torch.clamp(sdf, min=-delta, max=delta))
                 val_loss += loss
 
         val_loss /= size
