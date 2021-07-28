@@ -21,7 +21,7 @@ if __name__ == '__main__':
     learning_rate = 1e-5
     epochs = 1000
     regularization = 0  # Default: 1e-2
-    delta = 0.1
+    delta = 0.1  # Truncated distance
 
     print('Enter shape name:')
     name = input()
