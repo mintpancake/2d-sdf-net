@@ -34,7 +34,9 @@ def plot_sdf(sdf_func, device, res_path, name, mask_path,
 
     sdf_map = sdf_map[:-1, :-1]
     max_norm = np.max(np.abs(sdf_map)) if max_norm == 0 else max_norm
-    heat_map = np.minimum(sdf_map / max_norm * 127.5 + 127.5, 255)
+    heat_map = sdf_map / max_norm * 127.5 + 127.5
+    heat_map = np.minimum(heat_map, 255)
+    heat_map = np.maximum(heat_map, 0)
 
     # Plot predicted boundary
     low_pos = sdf_map > -margin
