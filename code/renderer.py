@@ -3,10 +3,13 @@ import numpy as np
 import cv2
 import torch
 from net import SDFNet
+from shape import Polygon
 
 MODEL_PATH = '../models/'
+DATA_PATH = '../shapes/normalized/'
 MASK_PATH = '../shapes/masks/'
-RES_PATH = '../results/trained_heatmaps/'
+TRAINED_PATH = '../results/trained_heatmaps/'
+TRUE_PATH = '../results/true_heatmaps/'
 
 
 # Adapted from https://github.com/Oktosha/DeepSDF-explained/blob/master/deepSDF-explained.ipynb
@@ -70,18 +73,33 @@ def plot_sdf(sdf_func, device, res_path, name, mask_path,
 
 
 if __name__ == '__main__':
+    mode = ''
+    while mode != 'trained' and mode != 'true':
+        print('Choose mode (trained/true):')
+        mode = input()
+
     print('Enter shape name:')
     name = input()
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f'Using {device}!')
-    model = SDFNet().to(device)
-    if os.path.exists(f'{MODEL_PATH}{name}.pth'):
-        model.load_state_dict(torch.load(f'{MODEL_PATH}{name}.pth'))
+    if mode == 'trained':
+        net = True
+        path = TRAINED_PATH
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print(f'Using {device}!')
+        func = SDFNet().to(device)
+        if os.path.exists(f'{MODEL_PATH}{name}.pth'):
+            func.load_state_dict(torch.load(f'{MODEL_PATH}{name}.pth'))
+        else:
+            print('Error: No trained data!')
+            exit(-1)
     else:
-        print('Error: No trained data!')
-        exit(-1)
+        net = False
+        path = TRUE_PATH
+        device = 'cpu'
+        shape = Polygon()
+        shape.load(DATA_PATH, name)
+        func = shape.sdf
 
     print('Plotting results...')
-    plot_sdf(model, device, res_path=RES_PATH, name=name, mask_path=MASK_PATH, is_net=True, show=False)
+    plot_sdf(func, device, res_path=path, name=name, mask_path=MASK_PATH, is_net=net, show=False)
     print('Done!')
