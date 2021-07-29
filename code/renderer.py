@@ -17,12 +17,13 @@ def plot_sdf(sdf_func, device, res_path, name, mask_path,
     high = 0.5
     grid_size = 100
     margin = 8e-3
+    max_norm = 0.3  # Normalizing distance
 
     grid = np.linspace(low, high, grid_size + 1)
     if not is_net:
         sdf_map = [[sdf_func(np.float_([x_, y_]))
                     for x_ in grid] for y_ in grid]
-        sdf_map = np.array(sdf_map, dtype=np.float)
+        sdf_map = np.array(sdf_map, dtype=np.float64)
     else:
         # Input shape is [1, 2]
         sdf_func.eval()
@@ -32,22 +33,23 @@ def plot_sdf(sdf_func, device, res_path, name, mask_path,
         sdf_map = torch.Tensor(sdf_map).cpu().numpy()
 
     sdf_map = sdf_map[:-1, :-1]
-
-    # Plot true boundary
+    max_norm = np.max(np.abs(sdf_map)) if max_norm == 0 else max_norm
+    heat_map = np.minimum(sdf_map / max_norm * 127.5 + 127.5, 255)
 
     # Plot predicted boundary
     low_pos = sdf_map > -margin
     high_pos = sdf_map < margin
     edge_pos = low_pos & high_pos
-    sdf_map = np.where(edge_pos, np.max(sdf_map), sdf_map)
+    heat_map = np.where(edge_pos, 0, heat_map)
 
     # Scale to canvas size
     scale = int(img_size / grid_size)
-    sdf_map = np.kron(sdf_map, np.ones((scale, scale)))
+    heat_map = np.kron(heat_map, np.ones((scale, scale)))
 
     # Generate a heat map
-    heat_map = None
-    heat_map = cv2.normalize(sdf_map, heat_map, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+    # heat_map = None
+    # heat_map = cv2.normalize(sdf_map, heat_map, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+    heat_map = np.uint8(heat_map)
     heat_map = cv2.applyColorMap(heat_map, cv2.COLORMAP_JET)
 
     # Plot true boundary
