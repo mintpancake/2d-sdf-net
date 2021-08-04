@@ -64,8 +64,8 @@ if __name__ == '__main__':
             optimizer.zero_grad()
 
             if batch % 50 == 0:
-                loss, current = loss.item(), batch * len(xy)
-                print(f'loss: {loss:>7f}  [{current:>5d}/{size:>5d}]')
+                loss_value, current = loss.item(), batch * len(xy)
+                print(f'loss: {loss_value:>7f}  [{current:>5d}/{size:>5d}]')
 
             total_train_step += 1
             if total_train_step % 200 == 0:

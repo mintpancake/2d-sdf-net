@@ -106,7 +106,7 @@ class ShapeSampler(object):
 
         # Do uniform sampling
         # Use polar coordinate
-        r = np.random.uniform(0, 0.5, size=(n, 1))
+        r = np.sqrt(np.random.uniform(0, 1, size=(n, 1))) / 2
         t = np.random.uniform(0, 2 * np.pi, size=(n, 1))
         # Transform to Cartesian coordinate
         uniform_points = np.concatenate((r * np.cos(t), r * np.sin(t)), axis=1)
