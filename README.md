@@ -3,7 +3,7 @@
 This is a neural network approximating the two-dimensional signed distance functions of polygons.
 The network structure references DeepSDF: https://github.com/facebookresearch/DeepSDF.
 
-## Intro
+### Intro
 
 * The signed distance function determines the minimum distance of a point to the boundary of a curve. 
 * The function is negative inside and positive outside. 
