@@ -11,15 +11,15 @@ The network structure references DeepSDF: https://github.com/facebookresearch/De
 
 ##### Sampled curve
 
-<div align=center><img width="150" height="150" src="https://raw.githubusercontent.com/mintpancake/gallery/main/images/sampled_vase.png"/></div>
+<div align=center><img width="400" height="400" src="https://raw.githubusercontent.com/mintpancake/gallery/main/images/sampled_vase.png"/></div>
 
 ##### Before truncation
 
-<div align=center><img width="150" height="150" src="https://raw.githubusercontent.com/mintpancake/gallery/main/images/sdf.png"/></div>
+<div align=center><img width="400" height="400" src="https://raw.githubusercontent.com/mintpancake/gallery/main/images/sdf.png"/></div>
 
 ##### After truncation
 
-<div align=center><img width="150" height="150" src="https://raw.githubusercontent.com/mintpancake/gallery/main/images/tsdf.png"/></div>
+<div align=center><img width="400" height="400" src="https://raw.githubusercontent.com/mintpancake/gallery/main/images/tsdf.png"/></div>
 
 ### Requirements
 
